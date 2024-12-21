@@ -1,5 +1,5 @@
-import "./ez-dialogs.css";
-import EzDialog from "./ez-dialog";
+import "../lib/style.css";
+import EzDialog from "../lib/ez-dialog";
 
 const ezDialogs = [...document.querySelectorAll("[ez-dialog]")].map(
   (elem: Element) => {

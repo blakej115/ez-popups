@@ -1,8 +1,20 @@
 {
-  "name": "ez-popups",
+  "name": "ez-dialogs",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/ez-dialog.umd.cjs",
+  "module": "./dist/ez-dialog.js",
+  "exports": {
+    ".": {
+      "import": "./dist/ez-dialog.js",
+      "require": "./dist/ez-dialog.umd.cjs"
+    },
+    "./style.css": "./dist/ez-dialogs.css"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
