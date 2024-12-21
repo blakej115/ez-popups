@@ -6,10 +6,14 @@
     <title>Ez Dialogs</title>
   </head>
   <body>
-    <dialog ez-dialog>
-      <button autofocus>Close</button>
+    <dialog ez-dialog="main" class="ez-dialog">
+      <button ez-dialog-close="main" class="ez-dialog-close">X</button>
+      <div ez-dialog-content="main" class="ez-dialog-content">
+        <h1>Dialog Example</h1>
+        <p>This is an example dialog.</p>
+      </div>
     </dialog>
-    <button ez-dialog-trigger>Open</button>
+    <button ez-dialog-trigger="main">Open</button>
     <script type="module" src="/src/ez-dialogs.ts"></script>
   </body>
 </html>
