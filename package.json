@@ -6,12 +6,12 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/ez-dialog.umd.cjs",
-  "module": "./dist/ez-dialog.js",
+  "main": "./dist/ez-dialogs.umd.cjs",
+  "module": "./dist/ez-dialogs.js",
   "exports": {
     ".": {
-      "import": "./dist/ez-dialog.js",
-      "require": "./dist/ez-dialog.umd.cjs"
+      "import": "./dist/ez-dialogs.js",
+      "require": "./dist/ez-dialogs.umd.cjs"
     },
     "./style.css": "./dist/ez-dialogs.css"
   },
