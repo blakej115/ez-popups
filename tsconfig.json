@@ -20,5 +20,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src", "lib/ez-dialog.ts"]
+  "include": ["lib", "global.d.ts"]
 }
