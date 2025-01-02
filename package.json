@@ -1,6 +1,5 @@
 {
   "name": "ez-dialogs",
-  "private": true,
   "version": "1.0.0",
   "type": "module",
   "files": [
@@ -21,6 +20,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
+  "author": "blakej115",
+  "license": "MIT",
+  "description": "Ez Dialogs is a lightweight library to make using the <dialog> element intuitive and easy.",
   "devDependencies": {
     "typescript": "~5.6.2",
     "vite": "^6.0.1",
