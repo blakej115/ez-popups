@@ -1,51 +1,78 @@
-type Config = {
+type EzDialogElems = NodeListOf<HTMLElement> | HTMLElement | string;
+
+type EzDialogConfig = {
   name?: string;
-  clickOutsideClose?: boolean;
+  backdropClose?: boolean;
+  triggersRef?: EzDialogElems;
+  closesRef?: EzDialogElems;
+  contentsRef?: string;
 };
 
 export default class EzDialog {
   elem: HTMLDialogElement;
-  config: Config;
-  triggers: Element[];
-  closes: Element[];
-  contents: Element[];
+  config: Required<EzDialogConfig>;
+  triggerElems: Element[];
+  closeElems: Element[];
 
-  constructor(
-    elem: HTMLDialogElement,
-    config: Config = {
-      name: elem.getAttribute("ez-dialog") ?? "",
-      clickOutsideClose: true,
-    }
-  ) {
-    this.elem = elem;
-    this.config = config;
+  constructor(elemRef: EzDialogElems, config: EzDialogConfig = {}) {
+    this.elem = EzDialog.getElems(elemRef)[0] as HTMLDialogElement;
 
-    this.triggers = [...document.querySelectorAll(`[ez-dialog-trigger="${this.config.name}"]`)];
-    this.closes = [...document.querySelectorAll(`[ez-dialog-close="${this.config.name}"]`)];
-    this.contents = [...document.querySelectorAll(`[ez-dialog-content="${this.config.name}"]`)];
+    this.config = { ...EzDialog.defaultConfig(this.elem), ...config };
 
-    this.initEvents();
+    this.triggerElems = EzDialog.getElems(this.config.triggersRef);
+    this.closeElems = EzDialog.getElems(this.config.closesRef);
+
+    this.open = this.open.bind(this);
+    this.close = this.close.bind(this);
+    this.closeBackdrop = this.closeBackdrop.bind(this);
+
+    this.addEventListeners();
   }
 
-  initEvents() {
-    this.triggers.forEach((trigger: Element) => {
-      trigger.addEventListener("click", () => {
-        this.elem.showModal();
-      });
-    });
+  static getElems(elemRef: EzDialogElems): Element[] {
+    if (elemRef instanceof HTMLElement) return [elemRef];
 
-    this.closes.forEach((close: Element) => {
-      close.addEventListener("click", () => {
-        this.elem.close();
-      });
-    });
+    if (elemRef instanceof HTMLCollection) return [...elemRef];
 
-    if (!this.config.clickOutsideClose) return;
+    return [...document.querySelectorAll(elemRef as string)];
+  }
 
-    this.elem.addEventListener("click", (e: MouseEvent) => {
-      if (!(e.target as Element).closest(`[ez-dialog-content="${this.config.name}"]`)) {
-        this.elem.close();
-      }
-    });
+  static defaultName(elem: HTMLDialogElement): string {
+    return elem.getAttribute("ez-dialog") ?? "";
+  }
+
+  static defaultConfig(elem: HTMLDialogElement): Required<EzDialogConfig> {
+    const name = EzDialog.defaultName(elem);
+
+    return {
+      name: name,
+      backdropClose: elem.getAttribute("ez-dialog-bd-close") !== "false" ? true : false,
+      triggersRef: elem.getAttribute("ez-dialog-triggers") ?? `[ez-dialog-trigger="${name}"]`,
+      closesRef: elem.getAttribute("ez-dialog-closes") ?? `[ez-dialog-close="${name}"]`,
+      contentsRef: elem.getAttribute("ez-dialog-contents") ?? `[ez-dialog-content="${name}"]`,
+    };
+  }
+
+  open() {
+    this.elem.showModal();
+  }
+
+  close() {
+    this.elem.close();
+  }
+
+  closeBackdrop(e: MouseEvent) {
+    if (!(e.target as Element).closest(this.config.contentsRef)) {
+      this.close();
+    }
+  }
+
+  addEventListeners() {
+    this.triggerElems.forEach((trigger: Element) => trigger.addEventListener("click", this.open));
+    this.closeElems.forEach((close: Element) => close.addEventListener("click", this.close));
+
+    if (!this.config.backdropClose) return;
+
+    this.elem.addEventListener("click", this.closeBackdrop);
   }
 }

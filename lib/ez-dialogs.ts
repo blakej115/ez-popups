@@ -13,7 +13,8 @@ class EzDialogs {
   }
 
   #reduceDialogs = (allDialogs: AllEzDialogs, elem: HTMLDialogElement): AllEzDialogs => {
-    allDialogs[elem.getAttribute("ez-dialog") ?? ""] = new EzDialog(elem);
+    const name = EzDialog.defaultName(elem);
+    allDialogs[name] = new EzDialog(elem);
     return allDialogs;
   };
 }
