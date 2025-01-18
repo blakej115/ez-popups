@@ -1,21 +1,28 @@
+type Config = {
+  name?: string;
+  clickOutsideClose?: boolean;
+};
+
 export default class EzDialog {
   elem: HTMLDialogElement;
-  name: string;
+  config: Config;
   triggers: Element[];
   closes: Element[];
   contents: Element[];
 
-  constructor(elem: HTMLDialogElement, name: string) {
+  constructor(
+    elem: HTMLDialogElement,
+    config: Config = {
+      name: elem.getAttribute("ez-dialog") ?? "",
+      clickOutsideClose: true,
+    }
+  ) {
     this.elem = elem;
-    this.name = name;
+    this.config = config;
 
-    this.triggers = [
-      ...document.querySelectorAll(`[ez-dialog-trigger="${name}"]`),
-    ];
-    this.closes = [...document.querySelectorAll(`[ez-dialog-close="${name}"]`)];
-    this.contents = [
-      ...document.querySelectorAll(`[ez-dialog-content="${name}"]`),
-    ];
+    this.triggers = [...document.querySelectorAll(`[ez-dialog-trigger="${this.config.name}"]`)];
+    this.closes = [...document.querySelectorAll(`[ez-dialog-close="${this.config.name}"]`)];
+    this.contents = [...document.querySelectorAll(`[ez-dialog-content="${this.config.name}"]`)];
 
     this.initEvents();
   }
@@ -33,10 +40,10 @@ export default class EzDialog {
       });
     });
 
+    if (!this.config.clickOutsideClose) return;
+
     this.elem.addEventListener("click", (e: MouseEvent) => {
-      if (
-        !(e.target as Element).closest(`[ez-dialog-content="${this.name}"]`)
-      ) {
+      if (!(e.target as Element).closest(`[ez-dialog-content="${this.config.name}"]`)) {
         this.elem.close();
       }
     });
