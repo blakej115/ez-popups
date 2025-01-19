@@ -1,20 +1,22 @@
 import "./style.css";
 import EzDialog from "./ez-dialog";
 
-type AllEzDialogs = {
+type EzDialogsAll = {
   [key: string]: EzDialog;
 };
 
 class EzDialogs {
-  dialogs: AllEzDialogs;
+  dialogs: EzDialogsAll;
 
   constructor() {
     this.dialogs = ([...document.querySelectorAll("[ez-dialog]")] as HTMLDialogElement[]).reduce(this.#reduceDialogs, {});
   }
 
-  #reduceDialogs = (allDialogs: AllEzDialogs, elem: HTMLDialogElement): AllEzDialogs => {
+  #reduceDialogs = (allDialogs: EzDialogsAll, elem: HTMLDialogElement): EzDialogsAll => {
     const name = EzDialog.defaultName(elem);
-    allDialogs[name] = new EzDialog(elem);
+    allDialogs[name] = new EzDialog(elem, {
+      name,
+    });
     return allDialogs;
   };
 }
