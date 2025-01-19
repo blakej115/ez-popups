@@ -2,6 +2,7 @@ type EzDialogElems = NodeListOf<HTMLElement> | HTMLElement | string;
 
 type EzDialogConfig = {
   name?: string;
+  autoCreate?: boolean;
   backdropClose?: boolean;
   triggersRef?: EzDialogElems;
   closesRef?: EzDialogElems;
@@ -11,24 +12,31 @@ type EzDialogConfig = {
 type EzDialogOptionalElem = HTMLDialogElement | null | undefined;
 
 export default class EzDialog {
-  elem!: HTMLDialogElement;
-  config!: Required<EzDialogConfig>;
-  triggerElems!: Element[];
-  closeElems!: Element[];
+  state: "created" | "destroyed" | null = null;
+  elem: HTMLDialogElement;
+  config: Required<EzDialogConfig>;
+  triggerElems: Element[] = [];
+  closeElems: Element[] = [];
 
   constructor(elemRef: EzDialogElems, config: EzDialogConfig = {}) {
-    this.create(elemRef, config);
+    this.elem = EzDialog.getElems(elemRef)[0] as HTMLDialogElement;
+    this.config = EzDialog.mergeConfig(this.elem, config);
+
+    if (this.config.autoCreate === false) return;
+
+    this.create();
   }
 
   static defaultName(elem?: EzDialogOptionalElem): string {
     return elem?.getAttribute("ez-dialog") ?? "";
   }
 
-  static mergeConfig(elem: EzDialogOptionalElem, config?: EzDialogConfig): Required<EzDialogConfig> {
+  static mergeConfig(elem?: EzDialogOptionalElem, config?: EzDialogConfig): Required<EzDialogConfig> {
     const name = config?.name ?? EzDialog.defaultName(elem);
 
     return {
       name,
+      autoCreate: config?.autoCreate ?? elem?.getAttribute("ez-dialog-auto") === "false" ? false : true,
       backdropClose: config?.backdropClose ?? elem?.getAttribute("ez-dialog-bd-close") === "false" ? false : true,
       triggersRef: config?.triggersRef ?? elem?.getAttribute("ez-dialog-triggers") ?? `[ez-dialog-trigger="${name}"]`,
       closesRef: config?.closesRef ?? elem?.getAttribute("ez-dialog-closes") ?? `[ez-dialog-close="${name}"]`,
@@ -36,10 +44,7 @@ export default class EzDialog {
     };
   }
 
-  setVars(elemRef: EzDialogElems, config: EzDialogConfig = this.config) {
-    this.elem = EzDialog.getElems(elemRef)[0] as HTMLDialogElement;
-    this.config = EzDialog.mergeConfig(this.elem, config);
-
+  setElems() {
     this.triggerElems = EzDialog.getElems(this.config.triggersRef);
     this.closeElems = EzDialog.getElems(this.config.closesRef);
   }
@@ -59,12 +64,16 @@ export default class EzDialog {
     this.elem.addEventListener("click", this.closeBackdrop);
   }
 
-  create(elemRef: EzDialogElems, config: EzDialogConfig = this.config) {
-    this.setVars(elemRef, config);
+  create() {
+    if (this.state === "created") return;
+
+    this.setElems();
 
     this.bindThis();
 
     this.addEventListeners();
+
+    this.state = "created";
   }
 
   static getElems(elemRef: EzDialogElems): Element[] {
@@ -99,6 +108,10 @@ export default class EzDialog {
   }
 
   destroy() {
+    if (this.state === "destroyed") return;
+
     this.removeEventListeners();
+
+    this.state = "destroyed";
   }
 }
